@@ -1,7 +1,8 @@
 import React from "react";
-import { BsBell, BsBookmark, BsEnvelope, BsTwitter } from "react-icons/bs";
-import { BiHash, BiHomeCircle, BiMoney, BiUser } from "react-icons/bi";
+import { BsBell, BsBookmark, BsEnvelope } from "react-icons/bs";
+import { BiHash, BiHomeCircle, BiUser } from "react-icons/bi";
 import { SlOptions } from "react-icons/sl";
+import { LiaTwitterSquare } from "react-icons/lia";
 
 interface TwitterSidebarButton {
     title: string;
@@ -31,7 +32,7 @@ export const SidebarMenuItems: TwitterSidebarButton[] = [
     },
     {
         title: "Twitter Blue",
-        icon: <BiMoney />,
+        icon: <LiaTwitterSquare />,
     },
     {
         title: "Profile",
