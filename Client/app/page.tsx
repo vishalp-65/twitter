@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import LandingPage from "./home/page";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
@@ -7,6 +8,7 @@ export default function Home() {
         <>
             <GoogleOAuthProvider clientId={clientId}>
                 <LandingPage />
+                <Toaster />
             </GoogleOAuthProvider>
         </>
     );

@@ -9,7 +9,7 @@
     "dev": "tsc-watch --onSuccess \"npm start\""
   },
   "devDependencies": {
-    "@types/cors": "^2.8.13",
+    "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.2",
     "prisma": "^4.16.2",
     "tsc-watch": "^6.0.4",

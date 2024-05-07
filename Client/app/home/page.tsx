@@ -3,6 +3,9 @@ import React, { useCallback } from "react";
 import SideBar from "../../components/sideBar/sideBar";
 import FeedCard from "@/components/FeedCard/page";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import toast from "react-hot-toast";
+import { graphqlClient } from "@/clients/api";
+import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 
 type Props = {};
 
@@ -11,6 +14,21 @@ const LandingPage = (props: Props) => {
         async (cred: CredentialResponse) => {
             const googleToken = cred.credential;
             console.log(googleToken);
+            if (!googleToken) return toast.error(`Google token not found`);
+
+            const { verifyGoogleToken } = await graphqlClient.request(
+                verifyUserGoogleTokenQuery,
+                { token: googleToken }
+            );
+
+            toast.success("Verified Success");
+            console.log(verifyGoogleToken);
+
+            if (verifyGoogleToken)
+                window.localStorage.setItem(
+                    "__twitter_token",
+                    verifyGoogleToken
+                );
         },
         []
     );
