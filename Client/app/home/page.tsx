@@ -1,10 +1,20 @@
-import React from "react";
+"use client";
+import React, { useCallback } from "react";
 import SideBar from "../../components/sideBar/sideBar";
 import FeedCard from "@/components/FeedCard/page";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 type Props = {};
 
 const LandingPage = (props: Props) => {
+    const handleLoginWithGoogle = useCallback(
+        async (cred: CredentialResponse) => {
+            const googleToken = cred.credential;
+            console.log(googleToken);
+        },
+        []
+    );
+
     return (
         <div>
             <div className="grid grid-cols-12 h-screen w-screen px-56">
@@ -21,7 +31,12 @@ const LandingPage = (props: Props) => {
                     <FeedCard />
                     <FeedCard />
                 </div>
-                <div className="col-span-3"></div>
+                <div className="col-span-3 p-5">
+                    <div className="p-5 bg-slate-700 rounded-lg">
+                        <h1 className="my-2 text-2xl">New to Twitter?</h1>
+                        <GoogleLogin onSuccess={handleLoginWithGoogle} />
+                    </div>
+                </div>
             </div>
         </div>
     );

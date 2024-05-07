@@ -3,6 +3,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
+import { prismaClient } from "../clients/db";
+
+import { User } from "./user";
 
 export async function initServer() {
     const app = express();
@@ -12,13 +15,14 @@ export async function initServer() {
 
     const graphqlServer = new ApolloServer({
         typeDefs: `
-            type Query{
-                sayHello:String
-            }
+       ${User.types}
+        type Query {
+            ${User.queries}
+        }
     `,
         resolvers: {
             Query: {
-                sayHello: () => "Hello from graphQl",
+                ...User.resolvers.queries,
             },
         },
     });
