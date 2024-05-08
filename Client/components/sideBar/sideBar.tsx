@@ -1,10 +1,14 @@
 import React from "react";
 import { BsTwitter } from "react-icons/bs";
 import { SidebarMenuItems } from "@/constant/sideBarMenu";
+import { useCurrentUser } from "@/hooks/user";
+import Image from "next/image";
 
 export default function SideBar() {
+    const { user } = useCurrentUser();
+
     return (
-        <div className="col-span-3 pt-1 ml-28">
+        <div className="col-span-3 pt-1 ml-28 relative">
             <div className="text-2xl h-fit w-fit hover:bg-gray-800 rounded-full p-4 cursor-pointer transition-all">
                 <BsTwitter />
             </div>
@@ -26,6 +30,24 @@ export default function SideBar() {
                     </button>
                 </div>
             </div>
+            {user && (
+                <div className="absolute bottom-5 flex gap-2 items-center bg-slate-800 px-3 py-2 rounded-full">
+                    {user && user.profileImageURL && (
+                        <Image
+                            className="rounded-full"
+                            src={user?.profileImageURL}
+                            alt="user-image"
+                            height={50}
+                            width={50}
+                        />
+                    )}
+                    <div>
+                        <h3 className="text-xl">
+                            {user.firstName} {user.lastName}
+                        </h3>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -6,14 +6,21 @@ import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { graphqlClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
+import { useCurrentUser } from "@/hooks/user";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {};
 
 const LandingPage = (props: Props) => {
+    const { user } = useCurrentUser();
+    const queryClient = useQueryClient();
+
+    console.log(user);
+
     const handleLoginWithGoogle = useCallback(
         async (cred: CredentialResponse) => {
             const googleToken = cred.credential;
-            console.log(googleToken);
+            // console.log(googleToken);
             if (!googleToken) return toast.error(`Google token not found`);
 
             const { verifyGoogleToken } = await graphqlClient.request(
@@ -24,13 +31,15 @@ const LandingPage = (props: Props) => {
             toast.success("Verified Success");
             console.log(verifyGoogleToken);
 
-            if (verifyGoogleToken)
+            if (verifyGoogleToken) {
                 window.localStorage.setItem(
                     "__twitter_token",
                     verifyGoogleToken
                 );
+            }
+            await queryClient.invalidateQueries(["curent-user"]);
         },
-        []
+        [queryClient]
     );
 
     return (
@@ -50,10 +59,12 @@ const LandingPage = (props: Props) => {
                     <FeedCard />
                 </div>
                 <div className="col-span-3 p-5">
-                    <div className="p-5 bg-slate-700 rounded-lg">
-                        <h1 className="my-2 text-2xl">New to Twitter?</h1>
-                        <GoogleLogin onSuccess={handleLoginWithGoogle} />
-                    </div>
+                    {!user && (
+                        <div className="p-5 bg-slate-700 rounded-lg">
+                            <h1 className="my-2 text-2xl">New to Twitter?</h1>
+                            <GoogleLogin onSuccess={handleLoginWithGoogle} />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
