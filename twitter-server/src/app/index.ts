@@ -8,6 +8,7 @@ import { prismaClient } from "../clients/db";
 import { User } from "./user";
 import JWTService from "../services/jwt";
 import { GraphqlContext } from "../interfaces";
+import { Tweet } from "./tweet";
 
 export async function initServer() {
     const app = express();
@@ -17,15 +18,26 @@ export async function initServer() {
 
     const graphqlServer = new ApolloServer<GraphqlContext>({
         typeDefs: `
-       ${User.types}
-        type Query {
-            ${User.queries}
-        }
-    `,
+           ${User.types}
+           ${Tweet.types}
+            type Query {
+                ${User.queries}
+                ${Tweet.queries}
+            }
+            type Mutation {
+              ${Tweet.muatations}
+            }
+        `,
         resolvers: {
             Query: {
                 ...User.resolvers.queries,
+                ...Tweet.resolvers.queries,
             },
+            Mutation: {
+                ...Tweet.resolvers.mutations,
+            },
+            ...Tweet.resolvers.extraResolvers,
+            ...User.resolvers.extraResolvers,
         },
     });
 

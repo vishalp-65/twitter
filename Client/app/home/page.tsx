@@ -1,6 +1,5 @@
 "use client";
 import React, { useCallback } from "react";
-import SideBar from "../../components/sideBar/sideBar";
 import FeedCard from "@/components/FeedCard/page";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
@@ -8,6 +7,9 @@ import { graphqlClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
+import { SideBar } from "@/components/sideBar/sideBar";
+import { User } from "@/gql/graphql";
+import CreateTweet from "@/components/createTweet";
 
 type Props = {};
 
@@ -45,18 +47,9 @@ const LandingPage = (props: Props) => {
     return (
         <div>
             <div className="grid grid-cols-12 h-screen w-screen px-56">
-                <SideBar />
+                <SideBar user={user as User} />
                 <div className="col-span-5 border-r-[1px] border-l-[1px] h-screen overflow-scroll border-gray-600">
-                    <FeedCard />
-                    <FeedCard />
-                    <FeedCard />
-                    <FeedCard />
-                    <FeedCard />
-                    <FeedCard />
-                    <FeedCard />
-                    <FeedCard />
-                    <FeedCard />
-                    <FeedCard />
+                    <CreateTweet user={user as User} />
                 </div>
                 <div className="col-span-3 p-5">
                     {!user && (

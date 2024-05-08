@@ -1,12 +1,20 @@
 import React from "react";
 import { BsTwitter } from "react-icons/bs";
 import { SidebarMenuItems } from "@/constant/sideBarMenu";
-import { useCurrentUser } from "@/hooks/user";
 import Image from "next/image";
 
-export default function SideBar() {
-    const { user } = useCurrentUser();
+interface Props {
+    user: {
+        __typename?: "User" | undefined;
+        id: string;
+        profileImageURL?: string | null | undefined;
+        email: string;
+        firstName: string;
+        lastName?: string | null | undefined;
+    };
+}
 
+export const SideBar: React.FC<Props> = ({ user }) => {
     return (
         <div className="col-span-3 pt-1 ml-28 relative">
             <div className="text-2xl h-fit w-fit hover:bg-gray-800 rounded-full p-4 cursor-pointer transition-all">
@@ -50,4 +58,4 @@ export default function SideBar() {
             )}
         </div>
     );
-}
+};
