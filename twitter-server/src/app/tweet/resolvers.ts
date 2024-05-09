@@ -1,22 +1,16 @@
 import { Tweet } from "@prisma/client";
-import { prismaClient } from "../../clients/db";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { GraphqlContext } from "../../interfaces";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { GraphqlContext } from "../../intefaces";
 import UserService from "../../services/user";
 import TweetService, { CreateTweetPayload } from "../../services/tweet";
 
 const s3Client = new S3Client({
-    region: process.env.AWS_REGION,
-    credentials: {
-        accessKeyId: process.env.AWS_S3_ACCESS_KEY!,
-        secretAccessKey: process.env.AWS_SECERT_KEY!,
-    },
+    region: process.env.AWS_DEFAULT_REGION,
 });
 
 const queries = {
     getAllTweets: () => TweetService.getAllTweets(),
-
     getSignedURLForTweet: async (
         parent: any,
         { imageType, imageName }: { imageType: string; imageName: string },
@@ -34,7 +28,7 @@ const queries = {
             throw new Error("Unsupported Image Type");
 
         const putObjectCommand = new PutObjectCommand({
-            Bucket: process.env.AWS_BUCKET_NAME,
+            Bucket: process.env.AWS_S3_BUCKET,
             ContentType: imageType,
             Key: `uploads/${ctx.user.id}/tweets/${imageName}-${Date.now()}`,
         });
