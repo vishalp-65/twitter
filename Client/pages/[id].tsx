@@ -1,12 +1,13 @@
 import { useRouter } from "next/router";
+import Twitterlayout from "@/components/FeedCard/Layout/TwitterLayout";
 import Image from "next/image";
 import type { GetServerSideProps, NextPage } from "next";
 import { BsArrowLeftShort } from "react-icons/bs";
+import { useCurrentUser } from "@/hooks/user";
+import FeedCard from "@/components/FeedCard";
 import { Tweet, User } from "@/gql/graphql";
 import { graphqlClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/query/user";
-import FeedCard from "@/components/FeedCard/page";
-import LandingPage from "../home/page";
 
 interface ServerProps {
     userInfo?: User;
@@ -17,12 +18,15 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
 
     return (
         <div>
-            <LandingPage>
+            <Twitterlayout>
                 <div>
                     <nav className="flex items-center gap-3 py-3 px-3">
                         <BsArrowLeftShort className="text-4xl" />
                         <div>
-                            <h1 className="text-2xl font-bold">Piyush Garg</h1>
+                            <h1 className="text-2xl font-bold">
+                                {props?.userInfo?.firstName}{" "}
+                                {props?.userInfo?.lastName}
+                            </h1>
                             <h1 className="text-md font-bold text-slate-500">
                                 {props.userInfo?.tweets?.length} Tweets
                             </h1>
@@ -38,7 +42,10 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
                                 height={100}
                             />
                         )}
-                        <h1 className="text-2xl font-bold mt-5">Piyush Garg</h1>
+                        <h1 className="text-2xl font-bold mt-5">
+                            {props?.userInfo?.firstName}{" "}
+                            {props?.userInfo?.lastName}
+                        </h1>
                     </div>
                     <div>
                         {props.userInfo?.tweets?.map((tweet) => (
@@ -46,7 +53,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
                         ))}
                     </div>
                 </div>
-            </LandingPage>
+            </Twitterlayout>
         </div>
     );
 };

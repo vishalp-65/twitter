@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-import { prismaClient } from "../clients/db";
 
 import { User } from "./user";
 import JWTService from "../services/jwt";
