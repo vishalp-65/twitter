@@ -1,6 +1,5 @@
 "use client";
 import React, { useCallback } from "react";
-import FeedCard from "@/components/FeedCard/page";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import toast from "react-hot-toast";
 import { graphqlClient } from "@/clients/api";
@@ -11,9 +10,11 @@ import { SideBar } from "@/components/sideBar/sideBar";
 import { User } from "@/gql/graphql";
 import CreateTweet from "@/components/createTweet";
 
-type Props = {};
+interface TwitterlayoutProps {
+    children: React.ReactNode;
+}
 
-const LandingPage = (props: Props) => {
+const LandingPage: React.FC<TwitterlayoutProps> = (props) => {
     const { user } = useCurrentUser();
     const queryClient = useQueryClient();
 
@@ -46,12 +47,12 @@ const LandingPage = (props: Props) => {
 
     return (
         <div>
-            <div className="grid grid-cols-12 h-screen w-screen px-56">
+            <div className="grid grid-cols-12 h-screen w-screen sm:px-56">
                 <SideBar user={user as User} />
-                <div className="col-span-5 border-r-[1px] border-l-[1px] h-screen overflow-scroll border-gray-600">
-                    <CreateTweet user={user as User} />
+                <div className="col-span-10 sm:col-span-5 border-r-[1px] border-l-[1px] h-screen overflow-scroll border-gray-600">
+                    {props.children}
                 </div>
-                <div className="col-span-3 p-5">
+                <div className="col-span-0 sm:col-span-3 p-5">
                     {!user && (
                         <div className="p-5 bg-slate-700 rounded-lg">
                             <h1 className="my-2 text-2xl">New to Twitter?</h1>

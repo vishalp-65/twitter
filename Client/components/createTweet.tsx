@@ -2,14 +2,13 @@ import Image from "next/image";
 import React, { useCallback, useState } from "react";
 import { BiImageAlt } from "react-icons/bi";
 import FeedCard from "./FeedCard/page";
-import { Tweet, User } from "@/gql/graphql";
+import { Tweet } from "@/gql/graphql";
 import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
+import LandingPage from "@/app/home/page";
+import { useCurrentUser } from "@/hooks/user";
 
-interface Props {
-    user: User;
-}
-
-const CreateTweet: React.FC<Props> = ({ user }) => {
+const CreateTweet = () => {
+    const { user } = useCurrentUser();
     const { tweets = [] } = useGetAllTweets();
     const { mutate } = useCreateTweet();
 
@@ -29,8 +28,7 @@ const CreateTweet: React.FC<Props> = ({ user }) => {
     }, [content, mutate]);
 
     return (
-        <div>
-            {" "}
+        <LandingPage>
             <div>
                 <div className="border border-r-0 border-l-0 border-b-0 border-gray-600 p-5 hover:bg-slate-900 transition-all cursor-pointer">
                     <div className="grid grid-cols-12 gap-3">
@@ -74,7 +72,7 @@ const CreateTweet: React.FC<Props> = ({ user }) => {
                     <FeedCard key={tweet?.id} data={tweet as Tweet} />
                 ) : null
             )}
-        </div>
+        </LandingPage>
     );
 };
 
