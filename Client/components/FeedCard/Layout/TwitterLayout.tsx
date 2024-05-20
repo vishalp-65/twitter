@@ -97,13 +97,13 @@ const Twitterlayout: React.FC<TwitterlayoutProps> = (props) => {
 
     return (
         <div>
-            <div className="grid grid-cols-12 h-screen w-screen sm:px-56">
+            <div className="grid grid-cols-12 h-screen w-screen sm:px-44">
                 <div className="col-span-2 sm:col-span-3 pt-1 flex sm:justify-end pr-4 relative">
                     <div>
                         <div className="text-2xl h-fit w-fit hover:bg-gray-800 rounded-full p-4 cursor-pointer transition-all">
                             <BsTwitter />
                         </div>
-                        <div className="mt-1 text-xl pr-4">
+                        <div className="text-xl md:text-2xl pr-4">
                             <ul>
                                 {sidebarMenuItems.map((item) => (
                                     <li key={item.title}>
@@ -111,7 +111,7 @@ const Twitterlayout: React.FC<TwitterlayoutProps> = (props) => {
                                             className="flex justify-start items-center gap-4 hover:bg-gray-800 rounded-full px-3 py-3 w-fit cursor-pointer mt-2"
                                             href={item.link}
                                         >
-                                            <span className=" text-3xl">
+                                            <span className="">
                                                 {item.icon}
                                             </span>
                                             <span className="hidden sm:inline">
@@ -121,7 +121,7 @@ const Twitterlayout: React.FC<TwitterlayoutProps> = (props) => {
                                     </li>
                                 ))}
                             </ul>
-                            <div className="mt-5 px-3">
+                            <div className="mt-3 px-3">
                                 <button className="hidden sm:block bg-[#1d9bf0] font-semibold text-lg py-2 px-4 rounded-full w-full">
                                     Tweet
                                 </button>
@@ -132,14 +132,14 @@ const Twitterlayout: React.FC<TwitterlayoutProps> = (props) => {
                         </div>
                     </div>
                     {user && (
-                        <div className="absolute bottom-5 flex gap-2 items-center bg-slate-800 px-3 py-2 rounded-full">
+                        <div className="absolute bottom-5 flex gap-2 items-center bg-slate-800 px-3 py-3 rounded-full">
                             {user && user.profileImageURL && (
                                 <Image
                                     className="rounded-full"
                                     src={user?.profileImageURL}
                                     alt="user-image"
-                                    height={50}
-                                    width={50}
+                                    height={30}
+                                    width={30}
                                 />
                             )}
                             <div className="hidden sm:block">
@@ -150,7 +150,7 @@ const Twitterlayout: React.FC<TwitterlayoutProps> = (props) => {
                         </div>
                     )}
                 </div>
-                <div className="col-span-10 sm:col-span-5 border-r-[1px] border-l-[1px] h-screen overflow-scroll border-gray-600">
+                <div className="col-span-10 sm:col-span-5 md:col-span-6 border-r-[1px] border-l-[1px] h-screen border-gray-600">
                     {props.children}
                 </div>
                 <div className="col-span-0 sm:col-span-3 p-5">

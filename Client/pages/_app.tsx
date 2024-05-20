@@ -11,13 +11,12 @@ const inter = Inter({ subsets: ["latin"] });
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
-    const clientId = process.env.GOOGLE_CLIENT_ID!;
-    console.log("env", process.env);
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID as string;
 
     return (
         <div className={inter.className}>
             <QueryClientProvider client={queryClient}>
-                <GoogleOAuthProvider clientId="317917764574-fb8sbf8ogil5eobe26dlbv91a1rs923v.apps.googleusercontent.com">
+                <GoogleOAuthProvider clientId={clientId}>
                     <Component {...pageProps} />
                     <Toaster />
                     <ReactQueryDevtools />
