@@ -1,25 +1,21 @@
+"use client";
 import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { BiImageAlt } from "react-icons/bi";
-import FeedCard from "@/components/FeedCard";
 import { useCurrentUser } from "@/hooks/user";
 import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
-import { Tweet } from "@/gql/graphql";
-import Twitterlayout from "@/components/FeedCard/Layout/TwitterLayout";
-import { GetServerSideProps } from "next";
-import {
-    getAllTweetsQuery,
-    getSignedURLForTweetQuery,
-} from "@/graphql/query/tweet";
+import { getSignedURLForTweetQuery } from "@/graphql/query/tweet";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { graphqlClient } from "@/clients/api";
+import FeedCard from "./FeedCard";
+import { Tweet } from "../../gql/graphql";
 
 interface HomeProps {
     tweets?: Tweet[];
 }
 
-export default function Home(props: HomeProps) {
+export default function Feed(props: HomeProps) {
     const { user } = useCurrentUser();
     const { tweets = props.tweets as Tweet[] } = useGetAllTweets();
     const { mutateAsync } = useCreateTweet();
@@ -78,12 +74,12 @@ export default function Home(props: HomeProps) {
     }, [mutateAsync, content, imageURL]);
 
     return (
-        <div>
-            <Twitterlayout>
-                <div>
-                    <div className="border border-r-0 border-l-0 border-b-0 border-gray-600 p-5 hover:bg-slate-900 transition-all cursor-pointer">
-                        <div className="grid grid-cols-12 gap-3">
-                            <div className="col-span-1">
+        <div className="w-full">
+            <div>
+                <div className="border border-r-0 border-l-0 border-b-0 border-gray-600 p-5 hover:bg-slate-900 transition-all cursor-pointer">
+                    <div className="flex flex-col items-start justify-between w-full">
+                        <div className="flex items-start justify-between gap-4 w-full">
+                            <div className="">
                                 {user?.profileImageURL && (
                                     <Image
                                         className="rounded-full"
@@ -94,55 +90,49 @@ export default function Home(props: HomeProps) {
                                     />
                                 )}
                             </div>
-                            <div className="col-span-11">
-                                <textarea
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                    className="w-full bg-transparent text-xl px-3 border-b border-slate-700"
-                                    placeholder="What's happening?"
-                                    rows={3}
-                                ></textarea>
-                                {imageURL && (
-                                    <Image
-                                        src={imageURL}
-                                        alt="tweet-image"
-                                        width={300}
-                                        height={300}
-                                    />
-                                )}
-                                <div className="mt-2 flex justify-between items-center">
-                                    <BiImageAlt
-                                        onClick={handleSelectImage}
-                                        className="text-xl"
-                                    />
-                                    <button
-                                        onClick={handleCreateTweet}
-                                        className="bg-[#1d9bf0] font-semibold text-sm py-2 px-4 rounded-full"
-                                    >
-                                        Tweet
-                                    </button>
-                                </div>
+                            <textarea
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                className="w-full bg-transparent border-b border-slate-700"
+                                placeholder="What's happening?"
+                                rows={3}
+                            ></textarea>
+                        </div>
+                    </div>
+                    <div className="flex flex-col items-center justify-between gap-2 mt-3">
+                        <div>
+                            {imageURL && (
+                                <Image
+                                    src={imageURL}
+                                    alt="tweet-image"
+                                    width={250}
+                                    height={250}
+                                />
+                            )}
+                        </div>
+                        <div className="mt-2 flex justify-between items-center w-full px-4">
+                            <div className="flex flex-col items-center text-gray-400 justify-between cursor-pointer hover:text-twitterBlue">
+                                <BiImageAlt
+                                    onClick={handleSelectImage}
+                                    className="w-6 h-6"
+                                />
+                                <p className="text-xs">Upload</p>
                             </div>
+                            <button
+                                onClick={handleCreateTweet}
+                                className="bg-[#1d9bf0] font-semibold text-sm py-2 px-4 rounded-full"
+                            >
+                                Tweet
+                            </button>
                         </div>
                     </div>
                 </div>
-                {tweets?.map((tweet) =>
-                    tweet ? (
-                        <FeedCard key={tweet?.id} data={tweet as Tweet} />
-                    ) : null
-                )}
-            </Twitterlayout>
+            </div>
+            {tweets?.map((tweet) =>
+                tweet ? (
+                    <FeedCard key={tweet?.id} data={tweet as Tweet} />
+                ) : null
+            )}
         </div>
     );
 }
-
-export const getServerSideProps: GetServerSideProps<HomeProps> = async (
-    context
-) => {
-    const allTweets = await graphqlClient.request(getAllTweetsQuery);
-    return {
-        props: {
-            tweets: allTweets.getAllTweets as Tweet[],
-        },
-    };
-};

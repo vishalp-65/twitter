@@ -1,4 +1,4 @@
-import { graphql } from "@/gql";
+import { graphql } from "../../../gql";
 
 export const getAllTweetsQuery = graphql(`
     #graphql
@@ -8,6 +8,8 @@ export const getAllTweetsQuery = graphql(`
             id
             content
             imageURL
+            createdAt
+            updatedAt
             author {
                 id
                 firstName

@@ -1,10 +1,9 @@
-import { useRouter } from "next/router";
-import Twitterlayout from "@/components/FeedCard/Layout/TwitterLayout";
+"use client";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import type { GetServerSideProps, NextPage } from "next";
 import { BsArrowLeftShort } from "react-icons/bs";
 import FeedCard from "@/components/FeedCard";
-import { Tweet, User } from "@/gql/graphql";
 import { graphqlClient } from "@/clients/api";
 import { getUserByIdQuery } from "@/graphql/query/user";
 import { useCallback, useMemo } from "react";
@@ -14,6 +13,8 @@ import {
 } from "@/graphql/mutation/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/user";
+import Twitterlayout from "@/components/layout/TwitterLayout";
+import { Tweet, User } from "../../../gql/graphql";
 
 interface ServerProps {
     userInfo?: User;
@@ -40,7 +41,9 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
         await graphqlClient.request(followUserMutation, {
             to: props.userInfo?.id,
         });
-        await queryClient.invalidateQueries(["curent-user"]);
+        await queryClient.invalidateQueries({
+            queryKey: ["current-user"],
+        });
     }, [props.userInfo?.id, queryClient]);
 
     const handleUnfollowUser = useCallback(async () => {
@@ -49,7 +52,9 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
         await graphqlClient.request(unfollowUserMutation, {
             to: props.userInfo?.id,
         });
-        await queryClient.invalidateQueries(["curent-user"]);
+        await queryClient.invalidateQueries({
+            queryKey: ["current-user"],
+        });
     }, [props.userInfo?.id, queryClient]);
 
     return (

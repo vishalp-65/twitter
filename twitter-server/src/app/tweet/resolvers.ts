@@ -35,6 +35,8 @@ const queries = {
 
         const signedURL = await getSignedUrl(s3Client, putObjectCommand);
 
+        console.log("image URL", signedURL);
+
         return signedURL;
     },
 };
