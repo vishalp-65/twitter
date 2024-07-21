@@ -70,6 +70,8 @@ export const getUserByIdQuery = graphql(`
             tweets {
                 content
                 id
+                imageURL
+                createdAt
                 author {
                     id
                     firstName

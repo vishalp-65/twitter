@@ -128,7 +128,7 @@ export default function Feed(props: HomeProps) {
                     </div>
                 </div>
             </div>
-            {tweets?.map((tweet) =>
+            {tweets?.map((tweet: any) =>
                 tweet ? (
                     <FeedCard key={tweet?.id} data={tweet as Tweet} />
                 ) : null

@@ -35,6 +35,10 @@ class TweetService {
         await redisClient.set("ALL_TWEETS", JSON.stringify(tweets));
         return tweets;
     }
+
+    public static async getTweetById(id: string) {
+        return prismaClient.tweet.findUnique({ where: { id } });
+    }
 }
 
 export default TweetService;

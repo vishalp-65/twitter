@@ -1,82 +1,86 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import type { GetServerSideProps, NextPage } from "next";
 import { BsArrowLeftShort } from "react-icons/bs";
 import FeedCard from "@/components/FeedCard";
-import { graphqlClient } from "@/clients/api";
-import { getUserByIdQuery } from "@/graphql/query/user";
-import { useCallback, useMemo } from "react";
 import {
     followUserMutation,
     unfollowUserMutation,
 } from "@/graphql/mutation/user";
+import { useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/user";
 import Twitterlayout from "@/components/layout/TwitterLayout";
 import { Tweet, User } from "../../../gql/graphql";
+import { graphqlClient } from "@/clients/api";
 
-interface ServerProps {
-    userInfo?: User;
+interface UserProfilePageClientProps {
+    userInfo: User;
 }
 
-const UserProfilePage: NextPage<ServerProps> = (props) => {
+const UserProfilePageClient: React.FC<UserProfilePageClientProps> = ({
+    userInfo,
+}) => {
     const router = useRouter();
 
     const { user: currentUser } = useCurrentUser();
     const queryClient = useQueryClient();
 
+    console.log("all tweet", userInfo?.tweets);
+
     const amIFollowing = useMemo(() => {
-        if (!props.userInfo) return false;
+        if (!userInfo) return false;
         return (
             (currentUser?.following?.findIndex(
-                (el) => el?.id === props.userInfo?.id
+                (el) => el?.id === userInfo.id
             ) ?? -1) >= 0
         );
-    }, [currentUser?.following, props.userInfo]);
+    }, [currentUser?.following, userInfo]);
 
     const handleFollowUser = useCallback(async () => {
-        if (!props.userInfo?.id) return;
+        if (!userInfo.id) return;
 
         await graphqlClient.request(followUserMutation, {
-            to: props.userInfo?.id,
+            to: userInfo.id,
         });
         await queryClient.invalidateQueries({
             queryKey: ["current-user"],
         });
-    }, [props.userInfo?.id, queryClient]);
+    }, [userInfo.id, queryClient]);
 
     const handleUnfollowUser = useCallback(async () => {
-        if (!props.userInfo?.id) return;
+        if (!userInfo.id) return;
 
         await graphqlClient.request(unfollowUserMutation, {
-            to: props.userInfo?.id,
+            to: userInfo.id,
         });
         await queryClient.invalidateQueries({
             queryKey: ["current-user"],
         });
-    }, [props.userInfo?.id, queryClient]);
+    }, [userInfo.id, queryClient]);
 
     return (
         <div>
             <Twitterlayout>
                 <div>
                     <nav className="flex items-center gap-3 py-3 px-3">
-                        <BsArrowLeftShort className="text-4xl" />
+                        <BsArrowLeftShort
+                            className="text-4xl"
+                            onClick={() => router.back()}
+                        />
                         <div>
                             <h1 className="text-2xl font-bold">
-                                {props?.userInfo?.firstName}{" "}
-                                {props?.userInfo?.lastName}
+                                {userInfo.firstName} {userInfo.lastName}
                             </h1>
                             <h1 className="text-md font-bold text-slate-500">
-                                {props.userInfo?.tweets?.length} Tweets
+                                {userInfo?.tweets?.length} Tweets
                             </h1>
                         </div>
                     </nav>
                     <div className="p-4 border-b border-slate-800">
-                        {props.userInfo?.profileImageURL && (
+                        {userInfo.profileImageURL && (
                             <Image
-                                src={props.userInfo?.profileImageURL}
+                                src={userInfo.profileImageURL}
                                 alt="user-image"
                                 className="rounded-full"
                                 width={100}
@@ -84,21 +88,18 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
                             />
                         )}
                         <h1 className="text-2xl font-bold mt-5">
-                            {props.userInfo?.firstName}{" "}
-                            {props.userInfo?.lastName}
+                            {userInfo.firstName} {userInfo.lastName}
                         </h1>
                         <div className="flex justify-between items-center">
                             <div className="flex gap-4 mt-2 text-sm text-gray-400">
                                 <span>
-                                    {props.userInfo?.followers?.length}{" "}
-                                    followers
+                                    {userInfo?.followers?.length} followers
                                 </span>
                                 <span>
-                                    {props.userInfo?.following?.length}{" "}
-                                    following
+                                    {userInfo?.following?.length} following
                                 </span>
                             </div>
-                            {currentUser?.id !== props.userInfo?.id && (
+                            {currentUser?.id !== userInfo.id && (
                                 <>
                                     {amIFollowing ? (
                                         <button
@@ -120,7 +121,7 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
                         </div>
                     </div>
                     <div>
-                        {props.userInfo?.tweets?.map((tweet) => (
+                        {userInfo?.tweets?.map((tweet) => (
                             <FeedCard data={tweet as Tweet} key={tweet?.id} />
                         ))}
                     </div>
@@ -130,22 +131,4 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
     );
 };
 
-export const getServerSideProps: GetServerSideProps<ServerProps> = async (
-    context
-) => {
-    const id = context.query.id as string | undefined;
-
-    if (!id) return { notFound: true, props: { userInfo: undefined } };
-
-    const userInfo = await graphqlClient.request(getUserByIdQuery, { id });
-
-    if (!userInfo?.getUserById) return { notFound: true };
-
-    return {
-        props: {
-            userInfo: userInfo.getUserById as User,
-        },
-    };
-};
-
-export default UserProfilePage;
+export default UserProfilePageClient;

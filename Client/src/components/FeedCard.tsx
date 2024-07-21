@@ -5,7 +5,7 @@ import { FaRetweet } from "react-icons/fa";
 import { AiOutlineHeart } from "react-icons/ai";
 import Link from "next/link";
 import { Tweet } from "../../gql/graphql";
-import { formatDate } from "@/utils/helper";
+import { formatRelativeTime } from "@/utils/helper";
 import { PiDotsThreeBold } from "react-icons/pi";
 
 interface FeedCardProps {
@@ -37,16 +37,15 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
                         <div className="flex flex-col items-start justify-between gap-1">
                             <div className="flex flex-col md:flex md:flex-row items-start md:items-center justify-start flex-wrap">
                                 <p className="font-bold text-nowrap">
-                                    <Link href={`/profile/${data.author?.id}`}>
+                                    <Link href={`/${data.author?.id}`}>
                                         {data.author?.firstName}{" "}
                                         {data.author?.lastName}
                                     </Link>
                                 </p>
                                 <p className="text-gray-400 text-xs text-nowrap md:text-sm ml-0 md:ml-2">
-                                    {formatDate(data.createdAt!)}
+                                    {formatRelativeTime(data.createdAt!)}
                                 </p>
                             </div>
-                            <p>{data.content}</p>
                         </div>
                     </div>
                     <div className="flex items-center justify-center p-2 cursor-pointer hover:bg-gray-800 hover:rounded-full hover:text-twitterBlue">
@@ -54,7 +53,8 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
                     </div>
                 </div>
             </div>
-            <div className="flex items-center justify-center mt-3 overflow-hidden px-2 py-1">
+            <p className="text-start px-2 mt-4 mb-2">{data.content}</p>
+            <div className="flex flex-col items-center justify-center mt-3 overflow-hidden px-2 py-1 gap-2">
                 {data.imageURL && (
                     <Image
                         src={data.imageURL}
