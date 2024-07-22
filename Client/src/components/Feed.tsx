@@ -97,7 +97,7 @@ export default function Feed(props: HomeProps) {
                             <textarea
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
-                                className="w-full bg-transparent border-b border-slate-700"
+                                className="w-full bg-transparent border-b border-slate-700 outline-none"
                                 placeholder="What's happening?"
                                 rows={3}
                             ></textarea>

@@ -87,11 +87,11 @@ const NavBar = (props: Props) => {
                         <DropdownMenuTrigger asChild>
                             <div
                                 className=" flex justify-start gap-4 items-center hover:bg-slate-900 
-                        w-fit px-3 py-3 hover:cursor-pointer hover:rounded-full"
+                        w-auto p-0 md:py-2 md:px-4 hover:cursor-pointer hover:rounded-full"
                             >
                                 {user && user.profileImageURL && (
                                     <Image
-                                        className="rounded-full"
+                                        className="rounded-full w-8 h-8"
                                         src={user?.profileImageURL}
                                         alt="user-image"
                                         height={30}
@@ -99,13 +99,13 @@ const NavBar = (props: Props) => {
                                     />
                                 )}
                                 <div className="hidden sm:block">
-                                    <h3 className="w-full">
+                                    <h3 className="w-full text-nowrap">
                                         {user.firstName} {user.lastName}
                                     </h3>
                                 </div>
                             </div>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
+                        <DropdownMenuContent className="ml-5 mb-1 w-20 md:w-56">
                             {/* <DropdownMenuSub>
                                 <DropdownMenuSubTrigger>
                                     <CiLight className="mr-2 h-4 w-4" />

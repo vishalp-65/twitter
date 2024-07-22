@@ -1,8 +1,10 @@
 import { prismaClient } from "../../clients/db";
 import { GraphqlContext } from "../../intefaces";
-import { User } from "@prisma/client";
+import { Tweet, User } from "@prisma/client";
 import UserService from "../../services/user";
 import { redisClient } from "../../clients/redis";
+import LikeService from "../../services/like";
+import CommentService from "../../services/comment";
 
 const queries = {
     verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
@@ -25,10 +27,26 @@ const queries = {
 
 const extraResolvers = {
     User: {
-        tweets: (parent: User) =>
-            prismaClient.tweet.findMany({
+        tweets: async (parent: User) => {
+            const tweets = await prismaClient.tweet.findMany({
                 where: { author: { id: parent.id } },
-            }),
+                orderBy: { createdAt: "desc" },
+            });
+            const tweetIds = tweets.map((tweet: Tweet) => tweet.id);
+            const [likesCount, userLikes, commentsData] = await Promise.all([
+                LikeService.getLikesCountForTweets(tweetIds),
+                LikeService.getUserLikes(parent.id!, tweetIds),
+                CommentService.getCommentsDataForTweets(tweetIds),
+            ]);
+
+            return tweets.map((tweet: Tweet) => ({
+                ...tweet,
+                totalLikes: likesCount[tweet.id] || 0,
+                isLikedByCurrentUser: userLikes.includes(tweet.id),
+                totalComments: commentsData.commentCounts[tweet.id] || 0,
+                latestComment: commentsData.latestComments[tweet.id] || null,
+            }));
+        },
         followers: async (parent: User) => {
             const result = await prismaClient.follows.findMany({
                 where: { following: { id: parent.id } },
@@ -47,6 +65,18 @@ const extraResolvers = {
             });
             return result.map((el) => el.following);
         },
+        followerCount: async (
+            parent: any,
+            { id }: { id: string },
+            ctx: GraphqlContext
+        ) => UserService.followerCount(id),
+
+        followingCount: async (
+            parent: any,
+            { id }: { id: string },
+            ctx: GraphqlContext
+        ) => UserService.followingCount(id),
+
         recommendedUsers: async (parent: User, _: any, ctx: GraphqlContext) => {
             if (!ctx.user) return [];
             const cachedValue = await redisClient.get(

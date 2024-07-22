@@ -9,6 +9,8 @@ export const types = `#graphql
 
         followers: [User]
         following: [User]
+        followerCount:Int
+        followingCount:Int
 
         recommendedUsers: [User]
 

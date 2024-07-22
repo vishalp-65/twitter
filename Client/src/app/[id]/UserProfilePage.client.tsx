@@ -65,7 +65,7 @@ const UserProfilePageClient: React.FC<UserProfilePageClientProps> = ({
                 <div>
                     <nav className="flex items-center gap-3 py-3 px-3">
                         <BsArrowLeftShort
-                            className="text-4xl"
+                            className="text-4xl cursor-pointer"
                             onClick={() => router.back()}
                         />
                         <div>
@@ -77,7 +77,7 @@ const UserProfilePageClient: React.FC<UserProfilePageClientProps> = ({
                             </h1>
                         </div>
                     </nav>
-                    <div className="p-4 border-b border-slate-800">
+                    <div className="p-4 border-b border-slate-800 ml-3">
                         {userInfo.profileImageURL && (
                             <Image
                                 src={userInfo.profileImageURL}

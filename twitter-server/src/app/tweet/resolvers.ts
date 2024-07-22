@@ -35,6 +35,7 @@ const queries = {
             latestComment: commentsData.latestComments[tweet.id] || null,
         }));
     },
+
     getSignedURLForTweet: async (
         parent: any,
         { imageType, imageName }: { imageType: string; imageName: string },

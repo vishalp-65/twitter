@@ -83,6 +83,22 @@ class UserService {
             },
         });
     }
+
+    // Function to count followers of a user
+    public static async followerCount(id: string): Promise<number> {
+        const count = await prismaClient.follows.count({
+            where: { followingId: id },
+        });
+        return count;
+    }
+
+    // Function to count followings of a user
+    public static async followingCount(id: string): Promise<number> {
+        const count = await prismaClient.follows.count({
+            where: { followerId: id },
+        });
+        return count;
+    }
 }
 
 export default UserService;
