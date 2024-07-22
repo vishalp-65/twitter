@@ -1,11 +1,11 @@
 export const types = `#graphql
 
-    input LikeData {
-        tweetId: String
-        commentId: String
+    type ToggleLikeResponse {
+        isLiked: Boolean!
+        likeCount: Int!
     }
 
-    input UnlikeData {
+    input ToggleLikePayload {
         tweetId: String
         commentId: String
     }

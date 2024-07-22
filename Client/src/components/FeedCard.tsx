@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import Image from "next/image";
 import { BiMessageRounded, BiUpload } from "react-icons/bi";
 import { FaHeart, FaRetweet } from "react-icons/fa";
@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Tweet } from "../../gql/graphql";
 import { formatRelativeTime } from "@/utils/helper";
 import { PiDotsThreeBold } from "react-icons/pi";
+import { useToggleLike } from "@/hooks/like";
 
 interface FeedCardProps {
     data: Tweet;
@@ -14,6 +15,21 @@ interface FeedCardProps {
 
 const FeedCard: React.FC<FeedCardProps> = (props) => {
     const { data } = props;
+    const toggleLike = useToggleLike();
+    const [likeCount, setLikeCount] = useState(data.totalLikes);
+    const [isLiked, setIsLiked] = useState(data.isLikedByCurrentUser);
+
+    const handleLikeUnlike = useCallback((tweetId: string) => {
+        toggleLike.mutate(
+            { tweetId },
+            {
+                onSuccess: (data: any) => {
+                    setLikeCount(data.likeCount);
+                    setIsLiked(data.isLiked);
+                },
+            }
+        );
+    }, []);
 
     return (
         <div
@@ -71,21 +87,24 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
                     <BiMessageRounded />
                     <p className=" text-sm">{data?.totalComments}</p>
                 </div>
-                <div className="flex items-center justify-center gap-2 hover:text-red-300 cursor-pointer">
-                    {data?.isLikedByCurrentUser ? (
+                <div
+                    className="flex items-center justify-center gap-2 hover:text-red-300 cursor-pointer"
+                    onClick={() => handleLikeUnlike(data.id)}
+                >
+                    {isLiked ? (
                         <FaHeart className="text-red-700" />
                     ) : (
                         <AiOutlineHeart />
                     )}
-                    <p className=" text-sm">{data?.totalLikes}</p>
+                    <p className=" text-sm">{likeCount}</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 cursor-pointer">
                     <FaRetweet />
-                    <p className=" text-sm">2K</p>
+                    <p className=" text-sm">200</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 cursor-pointer">
                     <BiUpload />
-                    <p className=" text-sm">2K</p>
+                    <p className=" text-sm">490</p>
                 </div>
             </div>
         </div>

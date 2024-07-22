@@ -1,3 +1,4 @@
+import { Like } from "@prisma/client";
 import { prismaClient } from "../clients/db";
 import { redisClient } from "../clients/redis";
 
@@ -14,45 +15,46 @@ export interface UnlikePayload {
 }
 
 class LikeService {
-    public static async likeTweetOrComment(data: LikePayload) {
-        const rateLimitFlag = await redisClient.get(
-            `RATE_LIMIT:LIKE:${data.userId}`
-        );
-        if (rateLimitFlag) throw new Error("Please wait....");
+    public static async toggleLikeTweetOrComment(payload: Like) {
+        const { userId, tweetId, commentId } = payload;
 
-        const like = await prismaClient.like.create({
-            data: {
-                user: { connect: { id: data.userId } },
-                tweet: data.tweetId
-                    ? { connect: { id: data.tweetId } }
-                    : undefined,
-                comment: data.commentId
-                    ? { connect: { id: data.commentId } }
-                    : undefined,
-            },
-        });
-
-        await redisClient.setex(`RATE_LIMIT:LIKE:${data.userId}`, 10, 1);
-        await redisClient.del(`LIKES:${data.tweetId || data.commentId}`);
-        return like;
-    }
-
-    public static async unlikeTweetOrComment(data: UnlikePayload) {
-        const like = await prismaClient.like.findFirst({
+        // Check if already liked
+        const existingLike = await prismaClient.like.findFirst({
             where: {
-                tweetId: data.tweetId,
-                commentId: data.commentId,
-                userId: data.userId,
+                userId,
+                tweetId,
+                commentId,
             },
         });
 
-        if (!like) {
-            throw new Error("Like not found");
+        let isLiked;
+        if (existingLike) {
+            // If already liked, unlike it
+            await prismaClient.like.delete({
+                where: { id: existingLike.id },
+            });
+            isLiked = false;
+        } else {
+            // If not liked yet, like it
+            await prismaClient.like.create({
+                data: {
+                    userId,
+                    tweetId,
+                    commentId,
+                },
+            });
+            isLiked = true;
         }
 
-        return prismaClient.like.delete({
-            where: { id: like.id },
-        });
+        // Get the updated like count
+        let likeCount = 0;
+        if (tweetId) {
+            likeCount = await prismaClient.like.count({ where: { tweetId } });
+        } else if (commentId) {
+            likeCount = await prismaClient.like.count({ where: { commentId } });
+        }
+
+        return { isLiked, likeCount: likeCount || 0 };
     }
 
     public static async getLikesByTweet(tweetId: string) {

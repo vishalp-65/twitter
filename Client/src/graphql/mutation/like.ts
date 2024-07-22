@@ -1,15 +1,11 @@
 import { graphql } from "../../../gql";
 
-export const createTweetMutation = graphql(`
+export const ToggleLikeMutation = graphql(`
     #graphql
-    mutation likeMutation($payload: LikeData!) {
-        likeTweetOrComment(payload: $payload) {
-            id
-        }
-    }
-    mutation dislikeMutation($payload: UnlikeData!) {
-        unlikeTweetOrComment(payload: $payload) {
-            id
+    mutation ToggleLikeTweetOrComment($payload: ToggleLikePayload!) {
+        toggleLikeTweetOrComment(payload: $payload) {
+            isLiked
+            likeCount
         }
     }
 `);

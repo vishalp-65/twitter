@@ -14,7 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n    #graphql\n    mutation createCommentMutation($payload: CreateCommentData!) {\n        createComment(payload: $payload) {\n            id\n        }\n    }\n    mutation deleteCommentMutation($payload: DeleteCommentData!) {\n        deleteComment(payload: $payload) {\n            id\n        }\n    }\n": types.CreateCommentMutationDocument,
-    "\n    #graphql\n    mutation likeMutation($payload: LikeData!) {\n        likeTweetOrComment(payload: $payload) {\n            id\n        }\n    }\n    mutation dislikeMutation($payload: UnlikeData!) {\n        unlikeTweetOrComment(payload: $payload) {\n            id\n        }\n    }\n": types.LikeMutationDocument,
+    "\n    #graphql\n    mutation ToggleLikeTweetOrComment($payload: ToggleLikePayload!) {\n        toggleLikeTweetOrComment(payload: $payload) {\n            isLiked\n            likeCount\n        }\n    }\n": types.ToggleLikeTweetOrCommentDocument,
     "\n    #graphql\n    mutation CreateTweet($payload: CreateTweetData!) {\n        createTweet(payload: $payload) {\n            id\n        }\n    }\n": types.CreateTweetDocument,
     "\n    #graphql\n    mutation FollowUser($to: ID!) {\n        followUser(to: $to)\n    }\n": types.FollowUserDocument,
     "\n    #graphql\n    mutation UnfollowUser($to: ID!) {\n        unfollowUser(to: $to)\n    }\n": types.UnfollowUserDocument,
@@ -47,7 +47,7 @@ export function graphql(source: "\n    #graphql\n    mutation createCommentMutat
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n    #graphql\n    mutation likeMutation($payload: LikeData!) {\n        likeTweetOrComment(payload: $payload) {\n            id\n        }\n    }\n    mutation dislikeMutation($payload: UnlikeData!) {\n        unlikeTweetOrComment(payload: $payload) {\n            id\n        }\n    }\n"): (typeof documents)["\n    #graphql\n    mutation likeMutation($payload: LikeData!) {\n        likeTweetOrComment(payload: $payload) {\n            id\n        }\n    }\n    mutation dislikeMutation($payload: UnlikeData!) {\n        unlikeTweetOrComment(payload: $payload) {\n            id\n        }\n    }\n"];
+export function graphql(source: "\n    #graphql\n    mutation ToggleLikeTweetOrComment($payload: ToggleLikePayload!) {\n        toggleLikeTweetOrComment(payload: $payload) {\n            isLiked\n            likeCount\n        }\n    }\n"): (typeof documents)["\n    #graphql\n    mutation ToggleLikeTweetOrComment($payload: ToggleLikePayload!) {\n        toggleLikeTweetOrComment(payload: $payload) {\n            isLiked\n            likeCount\n        }\n    }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
