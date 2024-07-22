@@ -39,6 +39,14 @@ export type CreateTweetData = {
   imageURL?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreateUserInput = {
+  email: Scalars['String']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  profileImageURL?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type DeleteCommentData = {
   commentId: Scalars['String']['input'];
 };
@@ -56,6 +64,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createComment?: Maybe<Comment>;
   createTweet?: Maybe<Tweet>;
+  createUser?: Maybe<TokenResponse>;
   deleteComment?: Maybe<Comment>;
   followUser?: Maybe<Scalars['Boolean']['output']>;
   toggleLikeTweetOrComment?: Maybe<ToggleLikeResponse>;
@@ -70,6 +79,11 @@ export type MutationCreateCommentArgs = {
 
 export type MutationCreateTweetArgs = {
   payload: CreateTweetData;
+};
+
+
+export type MutationCreateUserArgs = {
+  payload: CreateUserInput;
 };
 
 
@@ -156,6 +170,11 @@ export type ToggleLikeResponse = {
   __typename?: 'ToggleLikeResponse';
   isLiked: Scalars['Boolean']['output'];
   likeCount: Scalars['Int']['output'];
+};
+
+export type TokenResponse = {
+  __typename?: 'TokenResponse';
+  token: Scalars['String']['output'];
 };
 
 export type Tweet = {

@@ -1,7 +1,7 @@
 import { prismaClient } from "../../clients/db";
 import { GraphqlContext } from "../../intefaces";
 import { Tweet, User } from "@prisma/client";
-import UserService from "../../services/user";
+import UserService, { createUserData } from "../../services/user";
 import { redisClient } from "../../clients/redis";
 import LikeService from "../../services/like";
 import CommentService from "../../services/comment";
@@ -131,6 +131,20 @@ const extraResolvers = {
 };
 
 const mutations = {
+    createUser: async (
+        parent: any,
+        { payload }: { payload: createUserData },
+        ctx: GraphqlContext
+    ) => {
+        return await UserService.createUser(payload);
+    },
+    loginUser: async (
+        parent: any,
+        { payload }: { payload: createUserData },
+        ctx: GraphqlContext
+    ) => {
+        return await UserService.loginUser(payload);
+    },
     followUser: async (
         parent: any,
         { to }: { to: string },
