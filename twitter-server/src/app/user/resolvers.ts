@@ -5,6 +5,12 @@ import UserService, { createUserData } from "../../services/user";
 import { redisClient } from "../../clients/redis";
 import LikeService from "../../services/like";
 import CommentService from "../../services/comment";
+import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
+const s3Client = new S3Client({
+    region: process.env.AWS_DEFAULT_REGION,
+});
 
 const queries = {
     verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
@@ -23,6 +29,34 @@ const queries = {
         { id }: { id: string },
         ctx: GraphqlContext
     ) => UserService.getUserById(id),
+
+    getSignedURLForUserProfile: async (
+        parent: any,
+        { imageType, imageName }: { imageType: string; imageName: string },
+        ctx: GraphqlContext
+    ) => {
+        const allowedImageTypes = [
+            "image/jpg",
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        ];
+
+        if (!allowedImageTypes.includes(imageType))
+            throw new Error("Unsupported Image Type");
+
+        const putObjectCommand = new PutObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET,
+            ContentType: imageType,
+            Key: `uploads/users/${imageName}-${Date.now()}`,
+        });
+
+        const signedURL = await getSignedUrl(s3Client, putObjectCommand);
+
+        console.log("image URL", signedURL);
+
+        return signedURL;
+    },
 };
 
 const extraResolvers = {

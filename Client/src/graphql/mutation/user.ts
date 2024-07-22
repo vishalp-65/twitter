@@ -13,3 +13,21 @@ export const unfollowUserMutation = graphql(`
         unfollowUser(to: $to)
     }
 `);
+
+export const createUserMutation = graphql(`
+    #graphql
+    mutation CreateUser($payload: CreateUserInput!) {
+        createUser(payload: $payload) {
+            token
+        }
+    }
+`);
+
+export const loginUserMutation = graphql(`
+    #graphql
+    mutation LoginUser($payload: LoginUserInput!) {
+        loginUser(payload: $payload) {
+            token
+        }
+    }
+`);

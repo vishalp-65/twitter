@@ -88,3 +88,9 @@ export const getUserByIdQuery = graphql(`
         }
     }
 `);
+
+export const getSignedURLForUserProfileQuery = graphql(`
+    query Query($imageName: String!, $imageType: String!) {
+        getSignedURLForUserProfile(imageName: $imageName, imageType: $imageType)
+    }
+`);
