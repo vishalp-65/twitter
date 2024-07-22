@@ -4,6 +4,8 @@ import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { Toaster } from "react-hot-toast";
 import { QueryProvider } from "./provider/QueryClientProvider";
+import ThemeContextProvider from "@/context/theme-context";
+import ThemeSwitch from "@/components/theme-switch";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,10 +26,16 @@ export default function RootLayout({
             <body className={inter.className}>
                 <QueryProvider>
                     <GoogleOAuthProvider clientId={clientId}>
-                        <div className="min-h-screen w-full flex justify-center items-center font-sans">
-                            {children}
-                        </div>
-                        <Toaster />
+                        <ThemeContextProvider>
+                            <div
+                                className="min-h-screen w-full flex justify-center items-center font-sans overflow-x-hidden
+                            bg-white/20 dark:bg-black/95"
+                            >
+                                {children}
+                            </div>
+                            <Toaster />
+                            <ThemeSwitch />
+                        </ThemeContextProvider>
                     </GoogleOAuthProvider>
                 </QueryProvider>
             </body>

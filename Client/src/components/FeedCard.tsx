@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { BiMessageRounded, BiUpload } from "react-icons/bi";
-import { FaRetweet } from "react-icons/fa";
+import { FaHeart, FaRetweet } from "react-icons/fa";
 import { AiOutlineHeart } from "react-icons/ai";
 import Link from "next/link";
 import { Tweet } from "../../gql/graphql";
@@ -69,11 +69,15 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
             <div className="flex justify-between mt-1 items-center p-2 px-1 md:px-7 text-xl w-full text-gray-400">
                 <div className="flex items-center justify-center gap-2 cursor-pointer">
                     <BiMessageRounded />
-                    <p className=" text-sm">2K</p>
+                    <p className=" text-sm">{data?.totalComments}</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 hover:text-red-300 cursor-pointer">
-                    <AiOutlineHeart />
-                    <p className=" text-sm">2K</p>
+                    {data?.isLikedByCurrentUser ? (
+                        <FaHeart className="text-red-700" />
+                    ) : (
+                        <AiOutlineHeart />
+                    )}
+                    <p className=" text-sm">{data?.totalLikes}</p>
                 </div>
                 <div className="flex items-center justify-center gap-2 cursor-pointer">
                     <FaRetweet />

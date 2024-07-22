@@ -4,13 +4,37 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { GraphqlContext } from "../../intefaces";
 import UserService from "../../services/user";
 import TweetService, { CreateTweetPayload } from "../../services/tweet";
+import LikeService from "../../services/like";
+import CommentService from "../../services/comment";
 
 const s3Client = new S3Client({
     region: process.env.AWS_DEFAULT_REGION,
 });
 
 const queries = {
-    getAllTweets: () => TweetService.getAllTweets(),
+    getAllTweets: async (parent: any, args: any, ctx: GraphqlContext) => {
+        if (!ctx.user) {
+            throw new Error("Unauthenticated");
+        }
+
+        const tweets = await TweetService.getAllTweets();
+
+        // Fetch the likes, user's like status, and comments
+        const tweetIds = tweets.map((tweet: Tweet) => tweet.id);
+        const [likesCount, userLikes, commentsData] = await Promise.all([
+            LikeService.getLikesCountForTweets(tweetIds),
+            LikeService.getUserLikes(ctx.user.id, tweetIds),
+            CommentService.getCommentsDataForTweets(tweetIds),
+        ]);
+
+        return tweets.map((tweet: Tweet) => ({
+            ...tweet,
+            totalLikes: likesCount[tweet.id] || 0,
+            isLikedByCurrentUser: userLikes.includes(tweet.id),
+            totalComments: commentsData.commentCounts[tweet.id] || 0,
+            latestComment: commentsData.latestComments[tweet.id] || null,
+        }));
+    },
     getSignedURLForTweet: async (
         parent: any,
         { imageType, imageName }: { imageType: string; imageName: string },

@@ -4,6 +4,23 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useMemo } from "react";
 import { BsTwitter } from "react-icons/bs";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { MdDarkMode } from "react-icons/md";
+import { CiLight } from "react-icons/ci";
+import { RiComputerLine } from "react-icons/ri";
+import { LogOut, UserPlus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTheme } from "@/context/theme-context";
 
 interface TwitterSidebarButton {
     title: string;
@@ -15,11 +32,21 @@ type Props = {};
 
 const NavBar = (props: Props) => {
     const { user } = useCurrentUser();
+    const { theme, toggleTheme } = useTheme();
+    const router = useRouter();
 
     const sidebarMenuItems: TwitterSidebarButton[] = useMemo(
         () => navBar,
         [user?.id]
     );
+
+    const handleLogout = () => {
+        window.localStorage.removeItem("__twitter_token");
+        console.log("clear");
+        const token = window.localStorage.getItem("__twitter_token");
+        console.log("token", token);
+        router.push("/auth");
+    };
 
     return (
         <div className="h-full flex items-start justify-center ml-2 md:mr-8 ">
@@ -55,24 +82,65 @@ const NavBar = (props: Props) => {
                 </div>
             </div>
             {user && (
-                <div
-                    className="absolute bottom-5 flex justify-start gap-4 items-center hover:bg-slate-900 
+                <div className="absolute bottom-5">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <div
+                                className=" flex justify-start gap-4 items-center hover:bg-slate-900 
                         w-fit px-3 py-3 hover:cursor-pointer hover:rounded-full"
-                >
-                    {user && user.profileImageURL && (
-                        <Image
-                            className="rounded-full"
-                            src={user?.profileImageURL}
-                            alt="user-image"
-                            height={30}
-                            width={30}
-                        />
-                    )}
-                    <div className="hidden sm:block">
-                        <h3 className="w-full">
-                            {user.firstName} {user.lastName}
-                        </h3>
-                    </div>
+                            >
+                                {user && user.profileImageURL && (
+                                    <Image
+                                        className="rounded-full"
+                                        src={user?.profileImageURL}
+                                        alt="user-image"
+                                        height={30}
+                                        width={30}
+                                    />
+                                )}
+                                <div className="hidden sm:block">
+                                    <h3 className="w-full">
+                                        {user.firstName} {user.lastName}
+                                    </h3>
+                                </div>
+                            </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-56">
+                            {/* <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                    <CiLight className="mr-2 h-4 w-4" />
+                                    <span>Theme</span>
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuPortal>
+                                    <DropdownMenuSubContent>
+                                        <DropdownMenuItem
+                                            onClick={toggleTheme("light")}
+                                        >
+                                            <CiLight className="mr-2 h-4 w-4" />
+                                            <span>Light</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={toggleTheme("dark")}
+                                        >
+                                            <MdDarkMode className="mr-2 h-4 w-4" />
+                                            <span>Dark</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem
+                                            onClick={toggleTheme("system")}
+                                        >
+                                            <RiComputerLine className="mr-2 h-4 w-4" />
+                                            <span>System default</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuSubContent>
+                                </DropdownMenuPortal>
+                            </DropdownMenuSub> */}
+                            <DropdownMenuItem onClick={handleLogout}>
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Log out</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             )}
         </div>

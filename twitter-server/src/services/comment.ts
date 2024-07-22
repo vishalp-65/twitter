@@ -1,5 +1,6 @@
 import { prismaClient } from "../clients/db";
 import { redisClient } from "../clients/redis";
+import { Comment } from "@prisma/client";
 
 export interface CreateCommentPayload {
     content: string;
@@ -77,6 +78,44 @@ class CommentService {
         }
 
         return prismaClient.comment.delete({ where: { id: commentId } });
+    }
+
+    public static async getCommentsDataForTweets(tweetIds: string[]) {
+        // Fetch comment counts and latest comments for tweets
+        const [commentCounts, latestComments] = await Promise.all([
+            prismaClient.comment.groupBy({
+                by: ["tweetId"],
+                where: { tweetId: { in: tweetIds } },
+                _count: { tweetId: true },
+            }),
+            prismaClient.comment.findMany({
+                where: { tweetId: { in: tweetIds } },
+                orderBy: { createdAt: "desc" },
+                take: 1, // Fetch only the latest comment
+            }),
+        ]);
+
+        // Format data
+        const commentCountsMap = commentCounts.reduce(
+            (acc: { [key: string]: number }, count) => {
+                acc[count?.tweetId!] = count._count.tweetId;
+                return acc;
+            },
+            {}
+        );
+
+        const latestCommentsMap = latestComments.reduce(
+            (acc: { [key: string]: Comment | null }, comment) => {
+                acc[comment.tweetId!] = comment;
+                return acc;
+            },
+            {}
+        );
+
+        return {
+            commentCounts: commentCountsMap,
+            latestComments: latestCommentsMap,
+        };
     }
 }
 

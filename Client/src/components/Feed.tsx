@@ -65,6 +65,10 @@ export default function Feed(props: HomeProps) {
     }, [handleInputChangeFile]);
 
     const handleCreateTweet = useCallback(async () => {
+        if (!content.trim() && !imageURL) {
+            toast.error("Enter tweet");
+            return;
+        }
         await mutateAsync({
             content,
             imageURL,
