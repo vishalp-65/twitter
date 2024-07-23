@@ -1,17 +1,13 @@
 "use client";
-import { useCurrentUser } from "@/hooks/user";
 import React from "react";
-import Image from "next/image";
-import Link from "next/link";
 import NavBar from "../NavBar";
+import RecommendedUser from "../RecommendedUser";
 
 interface TwitterlayoutProps {
     children: React.ReactNode;
 }
 
 const Twitterlayout: React.FC<TwitterlayoutProps> = (props) => {
-    const { user } = useCurrentUser();
-
     return (
         <div className="grid grid-cols-12 min-h-screen w-screen items-start justify-center sm:px-10">
             {/* Navbar layout */}
@@ -27,37 +23,8 @@ const Twitterlayout: React.FC<TwitterlayoutProps> = (props) => {
             </div>
 
             {/* Recommended user */}
-            <div className="hidden md:block md:col-span-3 lg:col-span-3 xl:col-span-3 py-4">
-                <div className="px-4 w-fit py-3 bg-slate-800 rounded-lg">
-                    <h1 className="my-2 text-lg mb-5">Users you may know</h1>
-                    {user?.recommendedUsers?.map((el: any) => (
-                        <div
-                            className="flex items-center gap-3 mt-2"
-                            key={el?.id}
-                        >
-                            {el?.profileImageURL && (
-                                <Image
-                                    src={el?.profileImageURL}
-                                    alt="user-image"
-                                    className="rounded-full"
-                                    width={60}
-                                    height={60}
-                                />
-                            )}
-                            <div>
-                                <div className="text-lg">
-                                    {el?.firstName} {el?.lastName}
-                                </div>
-                                <Link
-                                    href={`/${el?.id}`}
-                                    className="bg-white text-black text-sm px-5 py-1 w-full rounded-lg"
-                                >
-                                    View
-                                </Link>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+            <div className="hidden lg:block lg:col-span-3 xl:col-span-3 py-4 sm:ml-0 lg:-ml-7">
+                <RecommendedUser />
             </div>
         </div>
     );

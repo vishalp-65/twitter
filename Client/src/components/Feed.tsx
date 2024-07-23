@@ -10,6 +10,8 @@ import { toast } from "react-hot-toast";
 import { graphqlClient } from "@/clients/api";
 import FeedCard from "./FeedCard";
 import { Tweet } from "../../gql/graphql";
+import { MdCancel } from "react-icons/md";
+import RecommendedUser from "./RecommendedUser";
 
 interface HomeProps {
     tweets?: Tweet[];
@@ -80,7 +82,7 @@ export default function Feed(props: HomeProps) {
     return (
         <div className="w-full">
             <div>
-                <div className="border border-r-0 border-l-0 border-b-0 border-gray-600 p-5 hover:bg-slate-900 transition-all cursor-pointer">
+                <div className="border border-r-0 border-l-0 border-b-0 border-gray-600 p-5 hover:bg-gray-100 dark:hover:bg-slate-900 transition-all cursor-pointer">
                     <div className="flex flex-col items-start justify-between w-full">
                         <div className="flex items-start justify-between gap-4 w-full">
                             <div className="">
@@ -106,16 +108,25 @@ export default function Feed(props: HomeProps) {
                     <div className="flex flex-col items-center justify-between gap-2 mt-3">
                         <div>
                             {imageURL && (
-                                <Image
-                                    src={imageURL}
-                                    alt="tweet-image"
-                                    width={250}
-                                    height={250}
-                                />
+                                <div
+                                    className="relative border-gray-500 p-1.5 cursor-pointer"
+                                    onClick={() => setImageURL("")}
+                                >
+                                    <Image
+                                        src={imageURL}
+                                        alt="tweet-image"
+                                        width={250}
+                                        height={250}
+                                        className="rounded-md shadow-sm"
+                                    />
+                                    <div className="absolute -top-2 -right-2">
+                                        <MdCancel className="w-7 h-7" />
+                                    </div>
+                                </div>
                             )}
                         </div>
                         <div className="mt-2 flex justify-between items-center w-full px-4">
-                            <div className="flex flex-col items-center text-gray-400 justify-between cursor-pointer hover:text-twitterBlue">
+                            <div className="flex flex-col items-center text-gray-800 dark:text-gray-400 justify-between cursor-pointer hover:text-twitterBlue">
                                 <BiImageAlt
                                     onClick={handleSelectImage}
                                     className="w-6 h-6"
@@ -124,13 +135,16 @@ export default function Feed(props: HomeProps) {
                             </div>
                             <button
                                 onClick={handleCreateTweet}
-                                className="bg-[#1d9bf0] font-semibold text-sm py-2 px-4 rounded-full"
+                                className="bg-twitterBlue text-white font-semibold text-sm py-2 px-4 rounded-full"
                             >
                                 Tweet
                             </button>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className="w-full lg:hidden">
+                <RecommendedUser />
             </div>
             {tweets?.map((tweet: any) =>
                 tweet ? (

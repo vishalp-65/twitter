@@ -7,7 +7,7 @@ import {
     followUserMutation,
     unfollowUserMutation,
 } from "@/graphql/mutation/user";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/user";
 import Twitterlayout from "@/components/layout/TwitterLayout";
@@ -22,42 +22,80 @@ const UserProfilePageClient: React.FC<UserProfilePageClientProps> = ({
     userInfo,
 }) => {
     const router = useRouter();
-
     const { user: currentUser } = useCurrentUser();
     const queryClient = useQueryClient();
-
-    console.log("all tweet", userInfo?.tweets);
-
-    const amIFollowing = useMemo(() => {
-        if (!userInfo) return false;
-        return (
-            (currentUser?.following?.findIndex(
-                (el) => el?.id === userInfo.id
-            ) ?? -1) >= 0
-        );
-    }, [currentUser?.following, userInfo]);
+    const [isFollow, setIsFollow] = useState(false);
 
     const handleFollowUser = useCallback(async () => {
         if (!userInfo.id) return;
 
-        await graphqlClient.request(followUserMutation, {
-            to: userInfo.id,
-        });
-        await queryClient.invalidateQueries({
-            queryKey: ["current-user"],
-        });
+        // Optimistically update the UI
+        setIsFollow(true);
+
+        try {
+            const response = await graphqlClient.request(followUserMutation, {
+                to: userInfo.id,
+            });
+
+            if (response?.followUser) {
+                setIsFollow(true);
+                // Invalidate relevant queries
+                await queryClient.invalidateQueries({
+                    queryKey: ["current-user"],
+                });
+                await queryClient.invalidateQueries({
+                    queryKey: ["recommended-users"],
+                });
+            } else {
+                setIsFollow(false); // Revert the UI update on failure
+            }
+        } catch (error) {
+            console.error("Error following user:", error);
+            setIsFollow(false); // Revert the UI update on error
+        }
     }, [userInfo.id, queryClient]);
 
     const handleUnfollowUser = useCallback(async () => {
         if (!userInfo.id) return;
 
-        await graphqlClient.request(unfollowUserMutation, {
-            to: userInfo.id,
-        });
-        await queryClient.invalidateQueries({
-            queryKey: ["current-user"],
-        });
+        // Optimistically update the UI
+        setIsFollow(false);
+
+        try {
+            const response = await graphqlClient.request(unfollowUserMutation, {
+                to: userInfo.id,
+            });
+
+            if (response?.unfollowUser) {
+                setIsFollow(false);
+                // Invalidate relevant queries
+                await queryClient.invalidateQueries({
+                    queryKey: ["current-user"],
+                });
+                await queryClient.invalidateQueries({
+                    queryKey: ["recommended-users"],
+                });
+            } else {
+                setIsFollow(true); // Revert the UI update on failure
+            }
+        } catch (error) {
+            console.error("Error unfollowing user:", error);
+            setIsFollow(true); // Revert the UI update on error
+        }
     }, [userInfo.id, queryClient]);
+
+    useEffect(() => {
+        const checkIfFollowing = () => {
+            if (!userInfo) return false;
+            return (
+                (currentUser?.following?.findIndex(
+                    (el) => el?.id === userInfo.id
+                ) ?? -1) >= 0
+            );
+        };
+
+        setIsFollow(checkIfFollowing());
+    }, [userInfo, currentUser]);
 
     return (
         <div>
@@ -91,7 +129,7 @@ const UserProfilePageClient: React.FC<UserProfilePageClientProps> = ({
                             {userInfo.firstName} {userInfo.lastName}
                         </h1>
                         <div className="flex justify-between items-center">
-                            <div className="flex gap-4 mt-2 text-sm text-gray-400">
+                            <div className="flex gap-4 mt-2 text-sm text-gray-700 dark:text-gray-400">
                                 <span>
                                     {userInfo?.followers?.length} followers
                                 </span>
@@ -101,17 +139,17 @@ const UserProfilePageClient: React.FC<UserProfilePageClientProps> = ({
                             </div>
                             {currentUser?.id !== userInfo.id && (
                                 <>
-                                    {amIFollowing ? (
+                                    {isFollow ? (
                                         <button
                                             onClick={handleUnfollowUser}
-                                            className="bg-white text-black px-3 py-1 rounded-full text-sm"
+                                            className="bg-gray-950 dark:bg-white text-white dark:text-black px-4 py-1.5 rounded-full text-sm"
                                         >
                                             Unfollow
                                         </button>
                                     ) : (
                                         <button
                                             onClick={handleFollowUser}
-                                            className="bg-white text-black px-3 py-1 rounded-full text-sm"
+                                            className="bg-gray-950 dark:bg-white text-white dark:text-black px-4 py-1.5 rounded-full text-sm"
                                         >
                                             Follow
                                         </button>

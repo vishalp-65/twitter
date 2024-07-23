@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import userImage from "../../public/user.png";
 import {
@@ -33,6 +33,7 @@ interface UserDataI {
         setPassword: (value: string) => void;
         setImage?: (value: string) => void;
     };
+    isClicked: boolean;
     onClose: () => void;
     onSave: () => void;
 }
@@ -41,55 +42,85 @@ export function DialogAuth({
     isDialogOpen,
     action,
     data,
+    isClicked,
     onClose,
     onSave,
 }: UserDataI) {
-    const [imageURL, setImageURL] = useState("");
+    const [imageURL, setImageURL] = useState(data.profileImageURL || "");
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleInputChangeFile = useCallback((input: HTMLInputElement) => {
-        return async (event: Event) => {
-            event.preventDefault();
-            const file: File | null | undefined = input.files?.item(0);
-            if (!file) return;
+    const handleInputChangeFile = async (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const file: File | null | undefined = event.target.files?.[0];
+        if (!file) return;
 
-            const { getSignedURLForUserProfile } = await graphqlClient.request(
-                getSignedURLForUserProfileQuery,
-                {
-                    imageName: file.name,
-                    imageType: file.type,
-                }
-            );
-
-            if (getSignedURLForUserProfile) {
-                toast.loading("Uploading...", { id: "2" });
-                await axios.put(getSignedURLForUserProfile, file, {
-                    headers: {
-                        "Content-Type": file.type,
-                    },
-                });
-                toast.success("Upload Completed", { id: "2" });
-                const url = new URL(getSignedURLForUserProfile);
-                const myFilePath = `${url.origin}${url.pathname}`;
-                setImageURL(myFilePath);
+        const { getSignedURLForUserProfile } = await graphqlClient.request(
+            getSignedURLForUserProfileQuery,
+            {
+                imageName: file.name,
+                imageType: file.type,
             }
-        };
-    }, []);
+        );
+
+        if (getSignedURLForUserProfile) {
+            toast.loading("Uploading...", { id: "2" });
+            await axios.put(getSignedURLForUserProfile, file, {
+                headers: {
+                    "Content-Type": file.type,
+                },
+            });
+            toast.success("Upload Completed", { id: "2" });
+            const url = new URL(getSignedURLForUserProfile);
+            const myFilePath = `${url.origin}${url.pathname}`;
+            setImageURL(myFilePath);
+        }
+    };
 
     useEffect(() => {
-        if (action === "register" && data.setImage) {
+        if (
+            action === "register" &&
+            data.setImage &&
+            imageURL !== data.profileImageURL
+        ) {
             data.setImage(imageURL);
         }
-    }, [imageURL]);
+    }, [imageURL, action, data]);
+
+    const validateInputs = useCallback(() => {
+        if (action === "register") {
+            if (
+                !data.firstName ||
+                !data.lastName ||
+                !data.email ||
+                !data.password
+            ) {
+                toast.error("All fields are required for registration.");
+                return false;
+            }
+        } else {
+            if (!data.email || !data.password) {
+                toast.error("Email and password are required for login.");
+                return false;
+            }
+        }
+        return true;
+    }, [action, data]);
+
+    const handleSave = useCallback(() => {
+        if (validateInputs()) {
+            onSave();
+        }
+    }, [validateInputs, onSave]);
 
     return (
         <Dialog open={isDialogOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="w-[95%] md:max-w-[425px] bg-gray-200 dark:bg-gray-950">
                 <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="text-xl">
                         {action === "register" ? "Register" : "Login"}
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-gray-600 dark:text-gray-500">
                         {action === "register"
                             ? "Register to create a new account."
                             : "Login to your account."}
@@ -102,11 +133,7 @@ export function DialogAuth({
                             id="profileImage"
                             type="file"
                             accept="image/*"
-                            onChange={(e) =>
-                                handleInputChangeFile(
-                                    e.target as HTMLInputElement
-                                )(e as any)
-                            }
+                            onChange={handleInputChangeFile}
                             className="hidden" // Hide the input visually
                         />
                         <div
@@ -129,7 +156,7 @@ export function DialogAuth({
                                 />
                             )}
                             <div className="absolute text-2xl -bottom-2.5 left-[28%]">
-                                <FaCirclePlus className="w-9 h-9 font-bold text-black dark:text-white" />
+                                <FaCirclePlus className="w-9 h-9 font-bold text-white border-gray-500" />
                             </div>
                         </div>
                     </div>
@@ -192,7 +219,12 @@ export function DialogAuth({
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="submit" onClick={onSave}>
+                    <Button
+                        type="submit"
+                        onClick={handleSave}
+                        className="bg-twitterBlue text-white hover:bg-twitterBlue/70"
+                        disabled={isClicked}
+                    >
                         {action === "register" ? "Register" : "Login"}
                     </Button>
                 </DialogFooter>

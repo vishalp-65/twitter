@@ -51,7 +51,7 @@ const NavBar = (props: Props) => {
     return (
         <div className="h-full flex items-start justify-center ml-2 md:mr-8 ">
             <div className="">
-                <div className="text-3xl md:text-4xl hover:bg-gray-800 rounded-full md:p-4 p-2 cursor-pointer transition-all">
+                <div className="text-3xl md:text-4xl  hover:bg-slate-300 dark:hover:bg-gray-800 rounded-full md:p-4 p-2 cursor-pointer transition-all">
                     <BsTwitter />
                 </div>
                 <div className="flex justify-center items-center">
@@ -59,7 +59,7 @@ const NavBar = (props: Props) => {
                         {sidebarMenuItems.map((item) => (
                             <li key={item.title}>
                                 <Link
-                                    className="flex justify-start items-center gap-6 hover:bg-gray-800 rounded-full px-3 py-3
+                                    className="flex justify-start items-center gap-6  hover:bg-slate-300 dark:hover:bg-gray-800 rounded-full px-3 py-3
                                             w-fit cursor-pointer"
                                     href={item.link}
                                 >
@@ -86,7 +86,7 @@ const NavBar = (props: Props) => {
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <div
-                                className=" flex justify-start gap-4 items-center hover:bg-slate-900 
+                                className=" flex justify-start gap-4 items-center hover:bg-slate-300 dark:hover:bg-slate-900 
                         w-auto p-0 md:py-2 md:px-4 hover:cursor-pointer hover:rounded-full"
                             >
                                 {user && user.profileImageURL && (
@@ -135,7 +135,10 @@ const NavBar = (props: Props) => {
                                     </DropdownMenuSubContent>
                                 </DropdownMenuPortal>
                             </DropdownMenuSub> */}
-                            <DropdownMenuItem onClick={handleLogout}>
+                            <DropdownMenuItem
+                                onClick={handleLogout}
+                                className="cursor-pointer"
+                            >
                                 <LogOut className="mr-2 h-4 w-4" />
                                 <span>Log out</span>
                             </DropdownMenuItem>

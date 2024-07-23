@@ -4,24 +4,46 @@
  * @returns A string representing the human-readable format.
  */
 
-export function formatRelativeTime(timestamp: string): string {
-    const now = Date.now();
-    const diff = now - Number(timestamp);
+export function isNumericString(str: string): boolean {
+    return /^\d+$/.test(str);
+}
 
-    const seconds = Math.floor(diff / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const hours = Math.floor(minutes / 60);
+export function timestampToISO(timestamp: number): string {
+    const date = new Date(timestamp);
+    return date.toISOString();
+}
 
-    if (seconds < 60) {
-        return `${seconds} sec ago`;
-    } else if (minutes < 60) {
-        return `${minutes} min ago`;
-    } else if (hours < 24) {
-        return `${hours} h ago`;
-    } else {
-        const date = new Date(timestamp);
-        const day = date.getDate();
-        const month = date.toLocaleString("default", { month: "long" });
-        return `${day} ${month}`;
+export function timeAgo(input: string | number): string {
+    const date = new Date(typeof input === "string" ? input : input);
+
+    if (isNaN(date.getTime())) {
+        return "Invalid Date";
     }
+
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    const intervals: { [key: string]: number } = {
+        year: 31536000,
+        month: 2592000,
+        week: 604800,
+        day: 86400,
+        hour: 3600,
+        minute: 60,
+        second: 1,
+    };
+
+    for (const key in intervals) {
+        const interval = intervals[key];
+        if (seconds >= interval) {
+            const count = Math.floor(seconds / interval);
+            return count === 1 ? `${count} ${key} ago` : `${count} ${key}s ago`;
+        }
+    }
+
+    const options: Intl.DateTimeFormatOptions = {
+        day: "numeric",
+        month: "long",
+    };
+    return date.toLocaleDateString(undefined, options);
 }

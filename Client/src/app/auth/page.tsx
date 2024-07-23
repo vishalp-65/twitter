@@ -7,7 +7,7 @@ import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import { useCreateUser, useCurrentUser, useLoginUser } from "@/hooks/user";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FaXTwitter } from "react-icons/fa6";
 
@@ -33,20 +33,31 @@ const IndexPage = (props: Props) => {
     const router = useRouter();
     const { user, isLoading } = useCurrentUser();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isclicked, setIsClicked] = useState(false);
     const [dialogAction, setDialogAction] = useState<"login" | "register">(
         "login"
     );
-    const [registerData, setRegisterData] = useState<RegisterI>({
+    const registerDataRef = useRef<RegisterI>({
         firstName: "",
         lastName: "",
         email: "",
         password: "",
         profileImageURL: "",
     });
-    const [loginData, setLoginData] = useState<LoginI>({
+    const loginDataRef = useRef<LoginI>({
         email: "",
         password: "",
     });
+
+    const [loginData, setLoginData] = useState<LoginI>(loginDataRef.current);
+    const [registerData, setRegisterData] = useState<RegisterI>(
+        registerDataRef.current
+    );
+
+    useEffect(() => {
+        registerDataRef.current = registerData;
+        loginDataRef.current = loginData;
+    }, [registerData, loginData]);
 
     useEffect(() => {
         if (!isLoading && user) {
@@ -85,77 +96,93 @@ const IndexPage = (props: Props) => {
     );
 
     // Create user
-    const handleRegister = useCallback(async () => {
-        if (
-            !registerData.firstName ||
-            !registerData.lastName ||
-            !registerData.email ||
-            !registerData.password
-        ) {
-            toast.error("All fields are required");
-            return;
+    const handleSave = useCallback(async () => {
+        // Validation logic
+        setIsClicked(true);
+        if (dialogAction === "register") {
+            if (
+                !registerDataRef.current.firstName ||
+                !registerDataRef.current.lastName ||
+                !registerDataRef.current.email ||
+                !registerDataRef.current.password
+            ) {
+                toast.error("All fields are required for registration.");
+                setIsClicked(false);
+                return;
+            }
+        } else {
+            if (!loginDataRef.current.email || !loginDataRef.current.password) {
+                toast.error("Email and password are required for login.");
+                setIsClicked(false);
+                return;
+            }
         }
-        try {
-            const response = await createUser({
-                ...registerData,
-            });
+        const data =
+            dialogAction === "register"
+                ? registerDataRef.current
+                : loginDataRef.current;
 
-            if (response.createUser?.token) {
-                window.localStorage.setItem(
-                    "__twitter_token",
-                    response.createUser.token
-                );
-                toast.success("Registration Successful");
-                router.push("/");
+        try {
+            if (dialogAction === "register") {
+                try {
+                    const response = await createUser({
+                        ...(data as RegisterI),
+                    });
+                    toast.success("User registered successfully");
+                    setIsDialogOpen(false);
+                    setRegisterData({
+                        firstName: "",
+                        lastName: "",
+                        email: "",
+                        password: "",
+                        profileImageURL: "",
+                    });
+                    if (response.createUser?.token) {
+                        window.localStorage.setItem(
+                            "__twitter_token",
+                            response.createUser.token
+                        );
+                        router.push("/");
+                    }
+                } catch (error) {
+                    toast.error("Registration failed");
+                    setIsClicked(false);
+                    console.error("Registration error:", error);
+                }
+            } else {
+                try {
+                    const response = await loginUser({
+                        ...(data as LoginI),
+                    });
+                    toast.success("User logged in successfully");
+                    setIsDialogOpen(false);
+                    setLoginData({
+                        email: "",
+                        password: "",
+                    });
+                    if (response.loginUser?.token) {
+                        window.localStorage.setItem(
+                            "__twitter_token",
+                            response.loginUser.token
+                        );
+                        router.push("/");
+                    }
+                } catch (error) {
+                    toast.error("Invaild credentials");
+                    setIsClicked(false);
+                    console.error("Login failed:", error);
+                }
             }
         } catch (error) {
-            toast.error("Registration failed");
+            toast.error("Something went wrong");
+            setIsClicked(false);
             console.error("Registration error:", error);
         }
-    }, [createUser, registerData]);
-
-    // Login function
-    const handleLogin = useCallback(async () => {
-        if (!loginData.email || !loginData.password) {
-            toast.error("All fields are required");
-            return;
-        }
-        console.log("data", loginData);
-        try {
-            const response = await loginUser({
-                ...loginData,
-            });
-
-            if (response.loginUser?.token) {
-                window.localStorage.setItem(
-                    "__twitter_token",
-                    response.loginUser.token
-                );
-                toast.success("Logged in");
-                router.push("/");
-            }
-        } catch (error) {
-            toast.error("Invalid Credential");
-            console.error("Registration error:", error);
-        }
-    }, [loginUser, registerData]);
+    }, [dialogAction, createUser, loginUser]);
 
     const openDialog = (action: "login" | "register") => {
         setDialogAction(action);
         setIsDialogOpen(true);
-    };
-
-    const closeDialog = () => {
-        setIsDialogOpen(false);
-    };
-
-    const saveDialog = () => {
-        if (dialogAction === "register") {
-            handleRegister();
-        } else {
-            handleLogin();
-        }
-        // setIsDialogOpen(false);
     };
 
     if (isLoading) {
@@ -200,7 +227,7 @@ const IndexPage = (props: Props) => {
                             </p>
                             <Button
                                 variant="ghost"
-                                className="w-[17rem] bg-blue-50 dark:bg-transparent border border-gray-300 rounded-full"
+                                className="w-[17rem] bg-blue-50 shadow-lg dark:bg-transparent border border-gray-300 rounded-full"
                                 onClick={() => {
                                     setIsDialogOpen(true);
                                     setDialogAction("login");
@@ -260,8 +287,9 @@ const IndexPage = (props: Props) => {
                                   })),
                           }
                 }
-                onClose={closeDialog}
-                onSave={saveDialog}
+                isClicked={isclicked}
+                onClose={() => setIsDialogOpen(false)}
+                onSave={handleSave}
             />
         </div>
     );
