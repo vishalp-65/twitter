@@ -36,6 +36,43 @@ const queries = {
         }));
     },
 
+    getTweetByID: async (
+        parent: any,
+        { tweetID }: { tweetID: string },
+        ctx: GraphqlContext
+    ) => {
+        if (!ctx.user) {
+            console.log("request recieved", tweetID);
+            throw new Error("Unauthenticated");
+        }
+
+        console.log("getting tweet");
+
+        const tweet = await TweetService.getTweetById(tweetID);
+
+        if (!tweet) {
+            throw new Error("Tweet not found");
+        }
+
+        console.log("tweet", tweet);
+        const tweetData = [tweet.id];
+        const [likesCount, userLikes, commentsData] = await Promise.all([
+            LikeService.getLikesCountForTweets(tweetData),
+            LikeService.getUserLikes(ctx.user.id, tweetData),
+            CommentService.getCommentsDataForTweets(tweetData),
+        ]);
+
+        console.log("tweet 2", { likesCount, userLikes, commentsData });
+
+        return {
+            ...tweet,
+            totalLikes: likesCount[tweet.id] || 0,
+            isLikedByCurrentUser: userLikes.includes(tweet.id),
+            totalComments: commentsData.commentCounts[tweet.id] || 0,
+            latestComment: commentsData.latestComments[tweet.id] || null,
+        };
+    },
+
     getSignedURLForTweet: async (
         parent: any,
         { imageType, imageName }: { imageType: string; imageName: string },

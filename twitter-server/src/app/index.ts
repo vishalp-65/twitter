@@ -68,11 +68,11 @@ export async function initServer() {
         "/graphql",
         expressMiddleware(graphqlServer, {
             context: async ({ req, res }) => {
+                const token = req.headers?.authorization?.split("Bearer ")[1];
+                console.log("token", token);
                 return {
                     user: req.headers.authorization
-                        ? JWTService.decodeToken(
-                              req.headers.authorization.split("Bearer ")[1]
-                          )
+                        ? JWTService.decodeToken(token!)
                         : undefined,
                 };
             },

@@ -10,15 +10,15 @@ const RecommendedUser = (props: Props) => {
 
     return (
         <div
-            className="px-4 w-full lg:w-72 py-5 border-gray-500 border-t lg:bg-gray-100 lg:border 
-        lg:border-gray-600 shadow-lg dark:bg-black pl-4 lg:rounded-lg"
+            className="px-4 w-full lg:w-72 py-5 border-gray-100 dark:border-gray-800 border-t lg:bg-white lg:border 
+        lg:border-gray-300 lg:dark:border-gray-800 shadow-lg dark:bg-black pl-4 lg:rounded-lg"
         >
             <h1 className="text-xl mb-3">Users you may know</h1>
-            <div className="flex flex-row lg:flex lg:flex-col items-start gap-3 justify-start overflow-x-scroll">
+            <div className="flex flex-row lg:flex lg:flex-col items-start gap-3 justify-start overflow-x-scroll lg:overflow-x-hidden">
                 {user?.recommendedUsers?.map((el: any) => (
                     <div
-                        className="flex flex-col lg:flex lg:flex-row items-center lg:items-start justify-center lg:justify-start lg:w-full gap-4 lg:gap-2 
-                        mt-1 lg:mt-2 border-gray-400 dark:border-gray-600 rounded-md border py-2 px-3 shadow-md bg-gray-100 dark:bg-gray-900"
+                        className="flex flex-col lg:flex lg:flex-row items-center lg:items-start justify-center lg:justify-start lg:w-full gap-4 lg:gap-4 
+                        mt-1 lg:mt-2 border-gray-300 dark:border-gray-800 rounded-md border py-2 px-3 shadow-md bg-white dark:bg-gray-950"
                         key={el?.id}
                     >
                         {el?.profileImageURL && (
@@ -36,7 +36,7 @@ const RecommendedUser = (props: Props) => {
                             </div>
                             <Link
                                 href={`/${el?.id}`}
-                                className="bg-gray-300 text-black text-sm px-5 py-1 w-fit rounded-lg"
+                                className="bg-gray-300 text-black text-sm px-5 py-1 w-fit rounded-lg hover:bg-twitterBlue/60"
                             >
                                 View
                             </Link>

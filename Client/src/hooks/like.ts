@@ -1,8 +1,10 @@
-import { graphqlClient } from "@/clients/api";
+import { createGraphqlClient } from "@/clients/api";
 import { useMutation } from "@tanstack/react-query";
 import { ToggleLikeMutation } from "@/graphql/mutation/like";
 
 export const useToggleLike = () => {
+    const graphqlClient = createGraphqlClient();
+
     const mutation = useMutation({
         mutationFn: async (payload: {
             tweetId?: string;

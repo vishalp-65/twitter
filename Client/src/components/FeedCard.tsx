@@ -97,18 +97,21 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
                     </div>
                 </div>
             </div>
+
             <p className="text-start mt-4 mb-2 px-7">{data.content}</p>
             <div className="flex flex-col items-center justify-center mt-3 overflow-hidden py-1 px-7 gap-2 cursor-pointer">
-                {data.imageURL && (
-                    <Image
-                        src={data.imageURL}
-                        alt="image"
-                        width={0}
-                        height={0}
-                        sizes="100vw"
-                        className="rounded-xl w-auto h-auto overflow-hidden"
-                    />
-                )}
+                <Link href={`/tweet/${data.id}`}>
+                    {data.imageURL && (
+                        <Image
+                            src={data.imageURL}
+                            alt="image"
+                            width={0}
+                            height={0}
+                            sizes="100vw"
+                            className="rounded-xl w-auto max-h-96 overflow-hidden"
+                        />
+                    )}
+                </Link>
             </div>
             <div className="flex justify-between items-center p-2 mt-2 px-5 md:px-10 text-lg w-full text-gray-700 dark:text-gray-400">
                 <div className="flex items-center justify-center gap-2 cursor-pointer">

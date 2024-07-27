@@ -12,7 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useCurrentUser } from "@/hooks/user";
 import Twitterlayout from "@/components/layout/TwitterLayout";
 import { Tweet, User } from "../../../gql/graphql";
-import { graphqlClient } from "@/clients/api";
+import { createGraphqlClient } from "@/clients/api";
 
 interface UserProfilePageClientProps {
     userInfo: User;
@@ -25,6 +25,7 @@ const UserProfilePageClient: React.FC<UserProfilePageClientProps> = ({
     const { user: currentUser } = useCurrentUser();
     const queryClient = useQueryClient();
     const [isFollow, setIsFollow] = useState(false);
+    const graphqlClient = createGraphqlClient();
 
     const handleFollowUser = useCallback(async () => {
         if (!userInfo.id) return;
@@ -89,7 +90,7 @@ const UserProfilePageClient: React.FC<UserProfilePageClientProps> = ({
             if (!userInfo) return false;
             return (
                 (currentUser?.following?.findIndex(
-                    (el) => el?.id === userInfo.id
+                    (el: any) => el?.id === userInfo.id
                 ) ?? -1) >= 0
             );
         };

@@ -7,7 +7,7 @@ import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
 import { getSignedURLForTweetQuery } from "@/graphql/query/tweet";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { graphqlClient } from "@/clients/api";
+import { createGraphqlClient } from "@/clients/api";
 import FeedCard from "./FeedCard";
 import { Tweet } from "../../gql/graphql";
 import { MdCancel } from "react-icons/md";
@@ -21,6 +21,7 @@ export default function Feed(props: HomeProps) {
     const { user } = useCurrentUser();
     const { tweets = props.tweets as Tweet[] } = useGetAllTweets();
     const { mutateAsync } = useCreateTweet();
+    const graphqlClient = createGraphqlClient();
 
     const [content, setContent] = useState("");
     const [imageURL, setImageURL] = useState("");

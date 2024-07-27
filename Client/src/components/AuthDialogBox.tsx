@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { graphqlClient } from "@/clients/api";
+import { createGraphqlClient } from "@/clients/api";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -48,6 +48,7 @@ export function DialogAuth({
 }: UserDataI) {
     const [imageURL, setImageURL] = useState(data.profileImageURL || "");
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const graphqlClient = createGraphqlClient();
 
     const handleInputChangeFile = async (
         event: React.ChangeEvent<HTMLInputElement>

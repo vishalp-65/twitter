@@ -34,6 +34,28 @@ export const getAllTweetsQuery = graphql(`
     }
 `);
 
+export const getTweetByIDQuery = graphql(`
+    #graphql
+
+    query GetTweetByID($tweetId: String!) {
+        getTweetByID(tweetID: $tweetId) {
+            id
+            imageURL
+            content
+            createdAt
+            isLikedByCurrentUser
+            totalComments
+            totalLikes
+            author {
+                firstName
+                id
+                lastName
+                profileImageURL
+            }
+        }
+    }
+`);
+
 export const getSignedURLForTweetQuery = graphql(`
     query GetSignedURL($imageName: String!, $imageType: String!) {
         getSignedURLForTweet(imageName: $imageName, imageType: $imageType)

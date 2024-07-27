@@ -1,9 +1,11 @@
-import { graphqlClient } from "@/clients/api";
+import { createGraphqlClient } from "@/clients/api";
 import { createTweetMutation } from "@/graphql/mutation/tweet";
 import { getAllTweetsQuery } from "@/graphql/query/tweet";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { CreateTweetData } from "../../gql/graphql";
+
+const graphqlClient = createGraphqlClient();
 
 export const useCreateTweet = () => {
     const queryClient = useQueryClient();

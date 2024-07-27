@@ -1,5 +1,5 @@
 "use client";
-import { graphqlClient } from "@/clients/api";
+import { createGraphqlClient } from "@/clients/api";
 import { DialogAuth } from "@/components/AuthDialogBox";
 import { Loading } from "@/components/Loading";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ interface LoginI {
 const IndexPage = (props: Props) => {
     const { mutateAsync: createUser } = useCreateUser();
     const { mutateAsync: loginUser } = useLoginUser();
+    const graphqlClient = createGraphqlClient();
 
     const router = useRouter();
     const { user, isLoading } = useCurrentUser();
@@ -125,7 +126,7 @@ const IndexPage = (props: Props) => {
         try {
             if (dialogAction === "register") {
                 try {
-                    const response = await createUser({
+                    const response: any = await createUser({
                         ...(data as RegisterI),
                     });
                     toast.success("User registered successfully");
@@ -151,7 +152,7 @@ const IndexPage = (props: Props) => {
                 }
             } else {
                 try {
-                    const response = await loginUser({
+                    const response: any = await loginUser({
                         ...(data as LoginI),
                     });
                     toast.success("User logged in successfully");

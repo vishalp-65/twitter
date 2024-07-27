@@ -1,9 +1,11 @@
-import { graphqlClient } from "@/clients/api";
+import { createGraphqlClient } from "@/clients/api";
 import { getCurrentUserQuery } from "@/graphql/query/user";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CreateUserInput, LoginUserInput } from "../../gql/graphql";
 import { createUserMutation, loginUserMutation } from "@/graphql/mutation/user";
 import toast from "react-hot-toast";
+
+const graphqlClient = createGraphqlClient();
 
 export const useCurrentUser = () => {
     const query = useQuery({
