@@ -22,12 +22,18 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-      working-directory: ./twitter/twitter-server
+    - name: Cache Yarn dependencies
+      uses: actions/cache@v3
+      with:
+        path: ./twitter-server/node_modules
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/twitter-server/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+    - run: npm install -g yarn
+    - run: yarn install
+      working-directory: ./twitter-server
     - run: |
-        touch .env
-        echo "${{ secrets.PROD_ENV_FILE }}" > .env
-      working-directory: ./twitter/twitter-server
+        touch ./twitter-server/.env
+        echo "${{ secrets.PROD_ENV_FILE }}" > ./twitter-server/.env
     - run: npm run build
-      working-directory: ./twitter/twitter-server
+      working-directory: ./twitter-server
