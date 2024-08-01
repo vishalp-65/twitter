@@ -37,3 +37,4 @@ jobs:
         echo "${{ secrets.PROD_ENV_FILE }}" > ./twitter-server/.env
     - run: npm run build
       working-directory: ./twitter-server
+    - run : pm2 restart twitter-backend
