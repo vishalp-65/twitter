@@ -69,7 +69,6 @@ export async function initServer() {
         expressMiddleware(graphqlServer, {
             context: async ({ req, res }) => {
                 const token = req.headers?.authorization?.split("Bearer ")[1];
-                console.log("token", token);
                 return {
                     user: req.headers.authorization
                         ? JWTService.decodeToken(token!)
